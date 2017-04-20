@@ -1,0 +1,22 @@
+#!/usr/bin/env zsh
+
+set -e
+
+setopt RE_MATCH_PCRE
+
+
+PROJECT_DIR=$PWD
+
+GIT_REMOTE=$(git config --get remote.origin.url)
+
+if [[ $GIT_REMOTE =~ 'git@github.com:([A-Za-z0-9](?:(?:[A-Za-z0-9]|\-(?!\-))+[A-Za-z0-9])?)/([A-Za-z0-9_\-\.]+)\.git' ]]; then
+  OWNER=$match[1]
+  NAME=$match[2]
+else 
+  echo "Could not parse a GitHub project from ${GIT_REMOTE}"
+  exit 1
+fi
+
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+open "https://github.com/$(url-encode $OWNER)/$(url-encode $NAME)/compare/master...$(url-encode $CURRENT_BRANCH)"
